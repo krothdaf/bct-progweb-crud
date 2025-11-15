@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-// URL DO SERVIDOR LOCAL (VIA LOCALTUNNEL/NGROK)
-// Use a URL que o localtunnel forneceu: https://afraid-trams-appear.loca.lt
 const ENDERECO_SERVIDOR = 'https://afraid-trams-appear.loca.lt'; 
 
 // Componente principal
@@ -13,7 +11,7 @@ function App() {
   // (Retrieve) Função para buscar os produtos da API
   const fetchProdutos = async () => {
     try {
-      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      // CORRIGIDO: Usa a URL completa (ENDERECO_SERVIDOR + /produtos)
       const response = await fetch(`${ENDERECO_SERVIDOR}/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos');
       const data = await response.json();
@@ -35,15 +33,13 @@ function App() {
       let response;
       let method;
       
-      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      // CORRIGIDO: Usa a URL completa (ENDERECO_SERVIDOR + /produto)
       let url = `${ENDERECO_SERVIDOR}/produto`;
 
       if (produto.produtoId) {
-        // Update (PUT)
         method = 'PUT';
         url += `/${produto.produtoId}`;
       } else {
-        // Create (POST)
         method = 'POST';
       }
 
@@ -80,7 +76,7 @@ function App() {
     }
 
     try {
-      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      // CORRIGIDO: Usa a URL completa (ENDERECO_SERVIDOR + /produto/id)
       const response = await fetch(`${ENDERECO_SERVIDOR}/produto/${id}`, {
         method: 'DELETE',
       });
