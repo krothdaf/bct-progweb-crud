@@ -2,35 +2,29 @@
   "version": 2,
   "public": true,
   
-  // Define o comando de instalação para garantir que as dependências 
-  // do backend ('pg') e do frontend sejam instaladas em seus respectivos locais.
-  "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend",
+  // CORREÇÃO: Comando de instalação simplificado e robusto
+  "installCommand": "npm install --production --prefix ./backend && npm install --prefix ./frontend",
   
   "builds": [
     {
-      // 1. Configura o backend (Node.js/Express) como uma Serverless Function
       "src": "backend/src/index.js",
       "use": "@vercel/node"
     },
     {
-      // 2. Configura o frontend (React) como build estático (Create React App)
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "frontend/build" 
-        // Pasta gerada pelo comando 'npm run build' do React
+        "distDir": "frontend/build"
       }
     }
   ],
   
   "routes": [
     {
-      // Rota 1: Tudo que começa com /api/* é enviado para o backend Node.js
       "src": "/api/(.*)",
       "dest": "backend/src/index.js"
     },
     {
-      // Rota 2: Todo o resto (a página inicial, CSS, JS do React) é servido pelo frontend
       "src": "/(.*)",
       "dest": "frontend/build/$1"
     }
