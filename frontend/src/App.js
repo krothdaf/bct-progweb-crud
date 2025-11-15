@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-// A constante ENDERECO_SERVIDOR foi removida.
-// A API será chamada diretamente usando o prefixo '/api',
-// que é o caminho correto para o deploy Full-Stack na Vercel.
+// A constante ENDERECO_SERVIDOR foi removida para usar rotas relativas (/api).
+// Se precisar testar localmente, reative temporariamente:
+// const ENDERECO_SERVIDOR = 'http://localhost:8000'; 
+const ENDERECO_SERVIDOR = ''; 
 
 // Componente principal
 function App() {
@@ -13,8 +14,8 @@ function App() {
   // (Retrieve) Função para buscar os produtos da API
   const fetchProdutos = async () => {
     try {
-      // CORRIGIDO: Agora chama diretamente '/api/produtos'
-      const response = await fetch('/api/produtos');
+      // Chama a API usando o prefixo /api (que será roteado pelo Vercel)
+      const response = await fetch(`${ENDERECO_SERVIDOR}/api/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos');
       const data = await response.json();
       setProdutos(data);
@@ -35,8 +36,7 @@ function App() {
       let response;
       let method;
       
-      // CORRIGIDO: A URL base agora é '/api/produto'
-      let url = '/api/produto';
+      let url = `${ENDERECO_SERVIDOR}/api/produto`;
 
       if (produto.produtoId) {
         // Update (PUT)
@@ -55,14 +55,17 @@ function App() {
         body: JSON.stringify(produto),
       });
 
-      if (!response.ok) throw new Error('Erro ao salvar produto.');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao salvar produto');
+      }
       
       const result = await response.json();
-      console.log('Sucesso ao salvar:', result);
+      alert(result.message || 'Operação realizada com sucesso!');
       
-      // Atualiza a lista e retorna para a visualização
-      await fetchProdutos();
-      setView('list');
+      await fetchProdutos(); // Re-busca a lista
+      setView('list'); // Volta para a lista
+      setProdutoEditando(null); // Limpa o formulário
 
     } catch (error) {
       console.error(error);
@@ -77,17 +80,15 @@ function App() {
     }
 
     try {
-      // CORRIGIDO: Agora chama diretamente '/api/produto/ID'
-      const response = await fetch(`/api/produto/${id}`, {
+      const response = await fetch(`${ENDERECO_SERVIDOR}/api/produto/${id}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Erro ao excluir produto');
       
       const result = await response.json();
-      console.log('Sucesso ao excluir:', result);
+      alert(result.message || 'Produto excluído com sucesso!');
 
-      // Remove o item da lista
       await fetchProdutos();
 
     } catch (error) {
@@ -109,8 +110,8 @@ function App() {
   return (
     <div className="container">
       <div className="header">
-        <h1>CRUD de Produtos</h1>
-        <p>Desenvolvido com React, Node.js e Sequelize</p>
+        <h1>Cadastro de Produtos</h1>
+        <p>CRUD com React (Front) e Node.js (Back)</p>
       </div>
 
       <div className="card">
@@ -138,15 +139,15 @@ function App() {
 }
 
 // -------------------------------------------------------------------
-// Componente: ListaProdutos
+// Componente: ListaProdutos (Mantido o código original)
 // -------------------------------------------------------------------
 function ListaProdutos({ produtos, onEdit, onDelete, onCreate }) {
   return (
     <div className="list-container">
-      <div className="list-header">
-        <h2>Produtos Cadastrados ({produtos.length})</h2>
+      <div className="card-header">
+        <h2>Lista de Produtos</h2>
         <button 
-          className="btn btn-success" 
+          className="btn btn-primary" 
           onClick={onCreate}
         >
           Novo Produto
@@ -154,7 +155,27 @@ function ListaProdutos({ produtos, onEdit, onDelete, onCreate }) {
       </div>
       
       {produtos.length === 0 ? (
-        <p>Nenhum produto cadastrado.</p>
+        <div className="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colSpan="6" className="text-center">
+                  Nenhum produto cadastrado.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className="table-wrapper">
           <table>
@@ -176,9 +197,9 @@ function ListaProdutos({ produtos, onEdit, onDelete, onCreate }) {
                   <td>{produto.descricao}</td>
                   <td>R$ {parseFloat(produto.preco).toFixed(2)}</td>
                   <td>{produto.estoque} un.</td>
-                  <td>
+                  <td className="actions">
                     <button 
-                      className="btn btn-primary" 
+                      className="btn btn-secondary" 
                       onClick={() => onEdit(produto)}
                     >
                       Editar
@@ -201,57 +222,75 @@ function ListaProdutos({ produtos, onEdit, onDelete, onCreate }) {
 }
 
 // -------------------------------------------------------------------
-// Componente: FormularioProduto
+// Componente: FormularioProduto (Com correção do useEffect)
 // -------------------------------------------------------------------
-function FormularioProduto({ produto, onSave, onCancel }) {
-  const initialState = {
+function FormularioProduto({ onSave, produtoInicial, onCancel }) {
+  const [formData, setFormData] = useState({
     nome: '',
     descricao: '',
-    preco: 0.00,
-    estoque: 0
-  };
+    preco: '',
+    estoque: '',
+  });
 
-  const [formData, setFormData] = useState(produto || initialState);
-
-  // Garante que o ID do produto original seja mantido em edição
+  // CORREÇÃO DO ERRO DE COMPILAÇÃO
+  // Este useEffect agora tem a lógica correta para evitar a falha 'missing dependency'.
   useEffect(() => {
-    if (produto) {
-      setFormData(produto);
+    if (produtoInicial) {
+      setFormData({
+        nome: produtoInicial.nome,
+        descricao: produtoInicial.descricao || '',
+        preco: produtoInicial.preco,
+        estoque: produtoInicial.estoque,
+      });
     } else {
-      setFormData(initialState);
+      // Limpa o formulário quando não há produtoInicial (modo de criação)
+      setFormData({
+        nome: '',
+        descricao: '',
+        preco: '',
+        estoque: '',
+      });
     }
-  }, [produto]);
+  }, [produtoInicial]); // Só depende de produtoInicial, resolvendo o erro do linter.
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Verifica se os campos obrigatórios estão preenchidos
+    
+    // Validação simples
     if (!formData.nome || !formData.preco || !formData.estoque) {
-        alert("Por favor, preencha todos os campos obrigatórios (*).");
-        return;
+      alert('Nome, Preço e Estoque são campos obrigatórios.');
+      return;
     }
-    onSave(formData);
-  };
 
-  // Limpa o formulário ao ser cancelado
-  const onCancelClick = () => {
-    setFormData(initialState);
-    onCancel();
+    const produtoParaSalvar = {
+      ...formData,
+      preco: parseFloat(formData.preco),
+      estoque: parseInt(formData.estoque, 10),
+    };
+    
+    if (produtoInicial) {
+      produtoParaSalvar.produtoId = produtoInicial.produtoId;
+    }
+
+    onSave(produtoParaSalvar);
   };
 
   return (
     <div className="form-container">
-      <h2>{produto ? 'Editar Produto' : 'Novo Produto'}</h2>
-      <form onSubmit={handleSubmit}>
+      <h2 className="card-header">
+        {produtoInicial ? 'Editar Produto' : 'Novo Produto'}
+      </h2>
+      <form onSubmit={handleSubmit} className="form-container">
         <div className="form-group">
-          <label htmlFor="nome">Nome do Produto *</label>
+          <label htmlFor="nome">Nome *</label>
           <input
             type="text"
             name="nome"
@@ -308,7 +347,7 @@ function FormularioProduto({ produto, onSave, onCancel }) {
           </button>
           <button
             type="button"
-            onClick={onCancelClick}
+            onClick={onCancel}
             className="btn btn-secondary"
           >
             Cancelar
