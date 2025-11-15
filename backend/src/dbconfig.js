@@ -2,7 +2,7 @@
 const { Sequelize } = require('sequelize');
 
 // Lê a URL do banco de dados das variáveis de ambiente que a Vercel configurou
-const connectionString = process.env.POSTGRES_URL;
+const connectionString = process.env.DATABASE_URL;
 
 // Validação simples
 if (!connectionString) {
