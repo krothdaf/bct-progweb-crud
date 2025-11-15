@@ -2,7 +2,6 @@
   "version": 2,
   "public": true,
   
-  // Comando que só instala e constrói o Frontend
   "installCommand": "npm install --prefix ./frontend && npm run build --prefix ./frontend",
   
   "routes": [
