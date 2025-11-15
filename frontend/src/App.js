@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const ENDERECO_SERVIDOR = 'https://afraid-trams-appear.loca.lt'; 
+const ENDERECO_SERVIDOR = 'https://nice-radios-pay.loca.lt'; 
 
 // Componente principal
 function App() {
