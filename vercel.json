@@ -1,9 +1,7 @@
 {
   "version": 2,
   "public": true,
-  
-  // CORREÇÃO: Comando de instalação simplificado e robusto
-  "installCommand": "npm install --production --prefix ./backend && npm install --prefix ./frontend",
+  "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend",
   
   "builds": [
     {
