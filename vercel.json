@@ -1,10 +1,6 @@
 {
   "version": 2,
   "public": true,
-  
-  // COMBINADO: Instala TUDO e, em seguida, constrói o Frontend
-  "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend && npm run build --prefix ./frontend",
-  
   "builds": [
     {
       "src": "backend/src/index.js",
@@ -12,13 +8,9 @@
     },
     {
       "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/build"
-      }
+      "use": "@vercel/static-build"
     }
   ],
-  
   "routes": [
     {
       "src": "/api/(.*)",
