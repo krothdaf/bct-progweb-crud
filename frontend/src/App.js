@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
-// A constante ENDERECO_SERVIDOR foi removida para usar rotas relativas (/api).
-// Se precisar testar localmente, reative temporariamente:
-// const ENDERECO_SERVIDOR = 'http://localhost:8000'; 
-const ENDERECO_SERVIDOR = ''; 
+// URL DO SERVIDOR LOCAL (VIA LOCALTUNNEL/NGROK)
+// Use a URL que o localtunnel forneceu: https://afraid-trams-appear.loca.lt
+const ENDERECO_SERVIDOR = 'https://afraid-trams-appear.loca.lt'; 
 
 // Componente principal
 function App() {
-  const [view, setView] = useState('list'); // 'list' ou 'form'
+  const [view, setView] = useState('list');
   const [produtos, setProdutos] = useState([]);
   const [produtoEditando, setProdutoEditando] = useState(null);
 
   // (Retrieve) Função para buscar os produtos da API
   const fetchProdutos = async () => {
     try {
-      // Chama a API usando o prefixo /api (que será roteado pelo Vercel)
-      const response = await fetch(`${ENDERECO_SERVIDOR}/api/produtos`);
+      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      const response = await fetch(`${ENDERECO_SERVIDOR}/produtos`);
       if (!response.ok) throw new Error('Erro ao buscar produtos');
       const data = await response.json();
       setProdutos(data);
@@ -36,7 +35,8 @@ function App() {
       let response;
       let method;
       
-      let url = `${ENDERECO_SERVIDOR}/api/produto`;
+      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      let url = `${ENDERECO_SERVIDOR}/produto`;
 
       if (produto.produtoId) {
         // Update (PUT)
@@ -63,9 +63,9 @@ function App() {
       const result = await response.json();
       alert(result.message || 'Operação realizada com sucesso!');
       
-      await fetchProdutos(); // Re-busca a lista
-      setView('list'); // Volta para a lista
-      setProdutoEditando(null); // Limpa o formulário
+      await fetchProdutos();
+      setView('list');
+      setProdutoEditando(null);
 
     } catch (error) {
       console.error(error);
@@ -80,7 +80,8 @@ function App() {
     }
 
     try {
-      const response = await fetch(`${ENDERECO_SERVIDOR}/api/produto/${id}`, {
+      // CORRIGIDO: Usa a URL completa do localtunnel (sem o prefixo /api)
+      const response = await fetch(`${ENDERECO_SERVIDOR}/produto/${id}`, {
         method: 'DELETE',
       });
 
@@ -232,7 +233,6 @@ function FormularioProduto({ onSave, produtoInicial, onCancel }) {
     estoque: '',
   });
 
-  // CORREÇÃO DO ERRO DE COMPILAÇÃO
   // Este useEffect agora tem a lógica correta para evitar a falha 'missing dependency'.
   useEffect(() => {
     if (produtoInicial) {

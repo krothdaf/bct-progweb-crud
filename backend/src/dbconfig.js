@@ -3,7 +3,7 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
 
-// Verifica se a variável de ambiente POSTGRES_URL existe
+// Prioriza a variável de ambiente (Vercel) ou usa fallback
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
 let sequelize;
@@ -19,19 +19,16 @@ if (connectionString) {
         rejectUnauthorized: false
       }
     },
-    logging: false // Desabilita logging do SQL
+    logging: false
   });
 } else {
   // Conexão LOCAL (SQLite)
   console.log("Conectando ao SQLite (Local)...");
   sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.join(__dirname, 'database.db'), // Onde o seu arquivo de DB está
+    storage: path.join(__dirname, 'database.db'), // Onde o arquivo de DB está
     logging: false
   });
 }
-
-// O Sequelize sincronizará os modelos em ambos os casos.
-// O nosso modelo 'produto.js' continuará funcionando.
 
 module.exports = sequelize;
