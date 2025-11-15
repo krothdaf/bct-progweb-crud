@@ -1,0 +1,3 @@
+.vercel
+# Garante que o arquivo de configuração antigo do backend nao seja rastreado
+backend/vercel.json
