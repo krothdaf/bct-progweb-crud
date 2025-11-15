@@ -10,7 +10,7 @@
       "use": "@vercel/node"
     },
     {
-      // Aqui, a Vercel entende que a saída são arquivos estáticos
+
       "src": "frontend/build/**", 
       "use": "@vercel/static"
     }
