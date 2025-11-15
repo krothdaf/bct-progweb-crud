@@ -1,13 +1,8 @@
 {
   "version": 2,
   "public": true,
-  
-  // 1. Comando de instalação e build do backend
   "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend",
-  
-  // 2. Comando para CONSTRUIR a aplicação React
   "buildCommand": "npm run build --prefix ./frontend", 
-  
   "builds": [
     {
       "src": "backend/src/index.js",
@@ -21,7 +16,6 @@
       }
     }
   ],
-  
   "routes": [
     {
       "src": "/api/(.*)",
