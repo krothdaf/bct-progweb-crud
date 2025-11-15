@@ -1,0 +1,6 @@
+#Dependências
+node_modules/
+#Pasta de build de produção
+build/
+#Logs
+npm-debug.log

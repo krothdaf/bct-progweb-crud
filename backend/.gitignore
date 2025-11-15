@@ -1,0 +1,6 @@
+#Dependências
+node_modules/
+#Banco de dados
+database.db
+#Logs
+npm-debug.log
