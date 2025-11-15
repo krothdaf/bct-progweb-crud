@@ -1,8 +1,10 @@
 {
   "version": 2,
   "public": true,
-  "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend",
-  "buildCommand": "npm run build --prefix ./frontend", 
+  
+  // COMBINADO: Instala TUDO e, em seguida, constrói o Frontend
+  "installCommand": "npm install --prefix ./backend && npm install --prefix ./frontend && npm run build --prefix ./frontend",
+  
   "builds": [
     {
       "src": "backend/src/index.js",
@@ -16,6 +18,7 @@
       }
     }
   ],
+  
   "routes": [
     {
       "src": "/api/(.*)",
