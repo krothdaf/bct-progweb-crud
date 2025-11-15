@@ -1,26 +1,37 @@
-// (CORRIGIDO para usar Vercel Postgres)
+// C:\projeto-final-crud\backend\src\dbconfig.js
+
 const { Sequelize } = require('sequelize');
+const path = require('path');
 
-// Lê a URL do banco de dados das variáveis de ambiente que a Vercel configurou
-const connectionString = process.env.DATABASE_URL;
+// Verifica se a variável de ambiente POSTGRES_URL existe
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
-// Validação simples
-if (!connectionString) {
-  throw new Error("Variável de ambiente POSTGRES_URL não definida!");
+let sequelize;
+
+if (connectionString) {
+  // Conexão de PRODUÇÃO (Neon/PostgreSQL)
+  console.log("Conectando ao PostgreSQL (Produção)...");
+  sequelize = new Sequelize(connectionString, {
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+    logging: false // Desabilita logging do SQL
+  });
+} else {
+  // Conexão LOCAL (SQLite)
+  console.log("Conectando ao SQLite (Local)...");
+  sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: path.join(__dirname, 'database.db'), // Onde o seu arquivo de DB está
+    logging: false
+  });
 }
 
-// Cria a instância do Sequelize conectando ao Postgres
-const sequelize = new Sequelize(connectionString, {
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false // Necessário para conexões Vercel
-    }
-  }
-});
-
-// O nosso modelo 'produto.js' (que já fizemos) vai usar este 'sequelize'
-// e o Sequelize é inteligente o suficiente para criar a tabela em Postgres.
+// O Sequelize sincronizará os modelos em ambos os casos.
+// O nosso modelo 'produto.js' continuará funcionando.
 
 module.exports = sequelize;
