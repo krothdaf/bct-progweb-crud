@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors'); // Importa o CORS
+const sqlite3 = require('sqlite3');
 
 const app = express(); // Inicializa o servidor
 const port = 8000; // Define a porta do servidor
